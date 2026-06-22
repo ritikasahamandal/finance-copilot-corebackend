@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -20,7 +20,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please add a password'],
         minlength: 6,
-        select: false // Excludes password by default when querying users
+        select: false 
     },
     createdAt: {
         type: Date,
@@ -28,7 +28,6 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
-// Pre-save hook: Encrypt password using bcrypt before writing to DB
 UserSchema.pre('save', async function(next) {
     if (!this.isModified('password')) {
         next();
@@ -37,9 +36,8 @@ UserSchema.pre('save', async function(next) {
     this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Instance method: Compare input password with hashed password in DB
 UserSchema.methods.matchPassword = async function(enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model('User', UserSchema);
+export default mongoose.model('User', UserSchema);
